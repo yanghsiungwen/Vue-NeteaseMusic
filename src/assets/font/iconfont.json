@@ -1,0 +1,114 @@
+{
+  "id": "1830166",
+  "name": "vue-neteasemusic",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "577350",
+      "name": "朋友",
+      "font_class": "pengyou",
+      "unicode": "e746",
+      "unicode_decimal": 59206
+    },
+    {
+      "icon_id": "1159887",
+      "name": "下载",
+      "font_class": "xiazai",
+      "unicode": "e617",
+      "unicode_decimal": 58903
+    },
+    {
+      "icon_id": "5330671",
+      "name": "音乐",
+      "font_class": "yinle",
+      "unicode": "e7b8",
+      "unicode_decimal": 59320
+    },
+    {
+      "icon_id": "5618784",
+      "name": "音乐列表",
+      "font_class": "yinleliebiao",
+      "unicode": "e674",
+      "unicode_decimal": 58996
+    },
+    {
+      "icon_id": "6260305",
+      "name": "收藏夹",
+      "font_class": "shoucangjia",
+      "unicode": "e614",
+      "unicode_decimal": 58900
+    },
+    {
+      "icon_id": "6536053",
+      "name": "文件-播放列表",
+      "font_class": "wj-bflb",
+      "unicode": "e724",
+      "unicode_decimal": 59172
+    },
+    {
+      "icon_id": "8206802",
+      "name": "寻找标的",
+      "font_class": "xzbd",
+      "unicode": "e766",
+      "unicode_decimal": 59238
+    },
+    {
+      "icon_id": "8575000",
+      "name": "未收藏",
+      "font_class": "aixinD",
+      "unicode": "e60d",
+      "unicode_decimal": 58893
+    },
+    {
+      "icon_id": "13479229",
+      "name": "云盘",
+      "font_class": "B",
+      "unicode": "e70a",
+      "unicode_decimal": 59146
+    },
+    {
+      "icon_id": "2212974",
+      "name": "未登录头象",
+      "font_class": "weidenglutouxiang",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
+    },
+    {
+      "icon_id": "6446143",
+      "name": "暂停",
+      "font_class": "tianchongxing-",
+      "unicode": "e631",
+      "unicode_decimal": 58929
+    },
+    {
+      "icon_id": "8341784",
+      "name": "上一首",
+      "font_class": "shangyishou",
+      "unicode": "e63c",
+      "unicode_decimal": 58940
+    },
+    {
+      "icon_id": "8341786",
+      "name": "下一首",
+      "font_class": "xiayishou",
+      "unicode": "e63e",
+      "unicode_decimal": 58942
+    },
+    {
+      "icon_id": "10885634",
+      "name": "暂停",
+      "font_class": "zanting",
+      "unicode": "e618",
+      "unicode_decimal": 58904
+    },
+    {
+      "icon_id": "12089102",
+      "name": "右箭头",
+      "font_class": "arrow_right_fat",
+      "unicode": "e62c",
+      "unicode_decimal": 58924
+    }
+  ]
+}
