@@ -1,13 +1,17 @@
 <template>
   <Layout>
+    <!-- 头部 -->
     <Header>
+      <!-- 导航栏 -->
       <Row>
+        <!-- 图标 -->
         <i-col span="5">
           <div class="brand">
             <img src="../assets/img/dragon.png" alt />
             <span>伪易云音乐</span>
           </div>
         </i-col>
+        <!-- 头部目录 -->
         <i-col span="10">
           <Menu mode="horizontal" active-name="1">
             <MenuItem name="1">个性推荐</MenuItem>
@@ -18,18 +22,32 @@
             <MenuItem name="6">最新音乐</MenuItem>
           </Menu>
         </i-col>
+        <!-- 搜索栏 -->
         <i-col span="6">
           <Input search enter-button placeholder="搜索音乐，视频，歌曲，电台" />
         </i-col>
-        <i-col span="2">
-          <div class="login">
+        <!-- 登录栏 -->
+        <i-col span="3">
+          <div class="login" @click="showLoginDiog" v-show="!isShow">
             <i class="iconfont icon-weidenglutouxiang"></i>
             <span>未登录</span>
           </div>
+          <Poptip v-model="visible" width="150" transfer>
+            <div class="successLog" v-show="isShow">
+              <img :src="userList.avatarUrl" alt />
+              <span>{{userList.nickname}}</span>
+            </div>
+            <div slot="content">
+              <a @click="logout">
+                <Icon type="ios-log-out" />退出登录
+              </a>
+            </div>
+          </Poptip>
         </i-col>
       </Row>
     </Header>
     <Layout>
+      <!-- 侧边栏 -->
       <Sider hide-trigger>
         <Menu width="200px">
           <MenuGroup v-for="item in siderMenu" :key="item.id" :name="item.id" :title="item.title">
@@ -42,6 +60,22 @@
       </Sider>
       <Content>Content</Content>
     </Layout>
+    <!-- 登录对话框 -->
+    <Modal v-model="loginVisible" title="登录" width="30%" :styles="style" footer-hide>
+      <Form ref="userFormRef" :model="userForm" :rules="userFormRule">
+        <FormItem prop="phone">
+          <Input type="text" v-model="userForm.phone" placeholder="Username" />
+          <Icon type="ios-person-outline" slot="prepend"></Icon>
+        </FormItem>
+        <FormItem prop="password">
+          <Input type="password" v-model="userForm.password" placeholder="Password" />
+          <Icon type="ios-lock-outline" slot="prepend"></Icon>
+        </FormItem>
+        <FormItem style="text-align:center">
+          <Button type="default" @click="userLogin">登录</Button>
+        </FormItem>
+      </Form>
+    </Modal>
   </Layout>
 </template>
 
@@ -88,17 +122,76 @@ export default {
             }
           ]
         }
-      ]
+      ],
+      // 显示对话框
+      loginVisible: false,
+      // 对话框样式
+      style: {
+        top: '180px'
+      },
+      // 表单数据
+      userForm: {
+        phone: '',
+        password: ''
+      },
+      // 表单验证规则
+      userFormRule: {},
+      // 用户信息
+      userList: [],
+      // 登出气泡框显示
+      visible: false,
+      isShow: false
     }
   },
-  method: {}
+  created() {},
+  methods: {
+    // 显示对话框
+    showLoginDiog() {
+      this.loginVisible = true
+    },
+    // 用户登录
+    userLogin() {
+      // 预验证
+      this.$refs.userFormRef.validate(async valid => {
+        if (!valid) return
+        const { data: res } = await this.$http.post(
+          'login/cellphone',
+          this.userForm
+        )
+        console.log(res)
+        if (res.code !== 200) {
+          return this.$message.error('登录失败！')
+        }
+        // 获取用户歌单信息
+        const con = await this.$http.get('user/playlist', {
+          params: { uid: res.profile.userId }
+        })
+        console.log(con)
+        // 提示信息，保存数据
+        this.$message.success('登录成功！')
+        this.userList = res.profile
+        this.isShow = true
+        this.loginVisible = false
+        window.sessionStorage.setItem('cookie', res.cookie)
+      })
+    },
+    logout() {
+      window.sessionStorage.clear()
+      this.visible = false
+      this.isShow = false
+      this.$message.success('成功退出！')
+    }
+  },
+  computed: {}
 }
 </script>
 
 <style scoped>
+/* 布局 */
 .ivu-layout {
   height: 100%;
 }
+/* 头部 */
 .ivu-layout-header {
   padding: 0;
   background: #e9eff5;
@@ -108,6 +201,8 @@ export default {
   height: 100%;
   background-color: #e2eff8;
 }
+
+/* 图标 */
 .brand {
   margin: 0 10px;
   width: 190px;
@@ -126,6 +221,15 @@ export default {
   font-weight: 600;
   display: inline-block;
 }
+
+/* 输入框样式 */
+.ivu-input-with-search {
+  margin: 16px 0;
+  width: 300px;
+  vertical-align: middle;
+}
+
+/* 登录块样式 */
 .login {
   height: 100%;
   width: 100px;
@@ -140,16 +244,30 @@ export default {
   margin-right: 10px;
   font-size: 26px;
 }
+
+/* 侧边栏 */
 .ivu-layout-sider {
   border-right: 1px solid #e8edf1;
 }
-.ivu-input-with-search {
-  margin: 16px 0;
-  width: 300px;
-  vertical-align: middle;
-}
+
+/* 侧边栏目录样式 */
 .ivu-menu-vertical .ivu-menu-item {
   padding: 8px 24px;
+  font-size: 14px;
+}
+
+/* 登录后头像信息 */
+.successLog {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.successLog img {
+  width: 32px;
+  border-radius: 25px;
+}
+.successLog span {
+  padding-left: 10px;
   font-size: 14px;
 }
 </style>
