@@ -13,7 +13,7 @@
         </i-col>
         <!-- 头部目录 -->
         <i-col span="10">
-          <Menu mode="horizontal" active-name="1">
+          <Menu mode="horizontal" active-name="1" class="headerMenu">
             <MenuItem name="1">个性推荐</MenuItem>
             <MenuItem name="2">每日歌曲推荐</MenuItem>
             <MenuItem name="3">歌单</MenuItem>
@@ -49,14 +49,21 @@
     <Layout>
       <!-- 侧边栏 -->
       <Sider hide-trigger>
-        <Menu width="200px">
-          <MenuGroup v-for="item in siderMenu" :key="item.id" :name="item.id" :title="item.title">
-            <MenuItem v-for="item2 in item.children" :key="item2.id" :name="item2.id">
-              <Icon :custom="'i-con iconfont ' + item2.type" />
-              {{item2.name}}
-            </MenuItem>
-          </MenuGroup>
-        </Menu>
+        <Scroll height="667">
+          <Menu width="183px" class="siderMenu">
+            <MenuGroup v-for="item in siderMenu" :key="item.id" :name="item.id" :title="item.title">
+              <MenuItem v-for="item2 in item.children" :key="item2.id" :name="item2.id">
+                <Icon :custom="'i-con iconfont ' + item2.type" />
+                {{item2.name}}
+              </MenuItem>
+            </MenuGroup>
+          </Menu>
+          <Menu width="183px" class="siderMenu musicMenu">
+            <MenuGroup title="创建的歌单" name="3">
+              <MenuItem v-for="item in musicList" :key="item.id" :name="item.id">{{item.name}}</MenuItem>
+            </MenuGroup>
+          </Menu>
+        </Scroll>
       </Sider>
       <Content>Content</Content>
     </Layout>
@@ -140,7 +147,9 @@ export default {
       userList: [],
       // 登出气泡框显示
       visible: false,
-      isShow: false
+      isShow: false,
+      // 音乐列表
+      musicList: []
     }
   },
   created() {},
@@ -163,10 +172,11 @@ export default {
           return this.$message.error('登录失败！')
         }
         // 获取用户歌单信息
-        const con = await this.$http.get('user/playlist', {
+        const { data: con } = await this.$http.get('user/playlist', {
           params: { uid: res.profile.userId }
         })
         console.log(con)
+        this.musicList = con.playlist
         // 提示信息，保存数据
         this.$message.success('登录成功！')
         this.userList = res.profile
@@ -197,7 +207,7 @@ export default {
   background: #e9eff5;
   border-bottom: 2px solid rgba(45, 140, 240, 0.5);
 }
-.ivu-menu {
+.headerMenu {
   height: 100%;
   background-color: #e2eff8;
 }
@@ -247,13 +257,23 @@ export default {
 
 /* 侧边栏 */
 .ivu-layout-sider {
-  border-right: 1px solid #e8edf1;
+  min-height: 486px;
+  background: #e2eff8;
+  font-size: 12px;
 }
-
-/* 侧边栏目录样式 */
-.ivu-menu-vertical .ivu-menu-item {
+.siderMenu {
+  background: #e2eff8;
+}
+.siderMenu .ivu-menu-item {
+  padding: 10px 24px;
+  font-size: 12px;
+}
+.musicMenu .ivu-menu-item {
   padding: 8px 24px;
-  font-size: 14px;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 /* 登录后头像信息 */

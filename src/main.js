@@ -9,7 +9,7 @@ import axios from 'axios'
 // 字体图标
 import './assets/font/iconfont.css'
 // 导入iview
-import { Button, Table, Layout, Header, Sider, Footer, Menu, MenuItem, Icon, Row, Col, Input, MenuGroup, Modal, Form, FormItem, Message, Poptip, Avatar } from 'iview'
+import { Button, Table, Layout, Header, Sider, Footer, Menu, MenuItem, Icon, Row, Col, Input, MenuGroup, Modal, Form, FormItem, Message, Poptip, Avatar, Scroll } from 'iview'
 import 'iview/dist/styles/iview.css'
 
 Vue.config.productionTip = false
@@ -33,6 +33,7 @@ Vue.component('Form', Form)
 Vue.component('FormItem', FormItem)
 Vue.component('Poptip', Poptip)
 Vue.component('Avatar', Avatar)
+Vue.component('Scroll', Scroll)
 
 // 注册为组件的方法
 Vue.prototype.$message = Message
