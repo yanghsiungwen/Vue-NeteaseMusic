@@ -189,6 +189,7 @@ export default {
       window.sessionStorage.clear()
       this.visible = false
       this.isShow = false
+      this.musicList = []
       this.$message.success('成功退出！')
     }
   },
