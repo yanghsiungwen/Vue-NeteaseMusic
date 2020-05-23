@@ -1,7 +1,7 @@
 <template>
   <Layout>
     <!-- 头部 -->
-    <Header>
+    <Header :style="{position: 'fixed', width: '100%', 'z-index':'9999'}">
       <!-- 导航栏 -->
       <Row>
         <!-- 图标 -->
@@ -48,11 +48,16 @@
     </Header>
     <Layout>
       <!-- 侧边栏 -->
-      <Sider hide-trigger>
+      <Sider hide-trigger :style="{margin:'64px 0 0 0', position:'fixed'}">
         <Scroll height="667">
           <Menu width="183px" class="siderMenu">
             <MenuGroup v-for="item in siderMenu" :key="item.id" :name="item.id" :title="item.title">
-              <MenuItem v-for="item2 in item.children" :key="item2.id" :name="item2.id">
+              <MenuItem
+                v-for="item2 in item.children"
+                :key="item2.id"
+                :name="item2.id"
+                :to="item2.path"
+              >
                 <Icon :custom="'i-con iconfont ' + item2.type" />
                 {{item2.name}}
               </MenuItem>
@@ -65,7 +70,10 @@
           </Menu>
         </Scroll>
       </Sider>
-      <Content>Content</Content>
+      <!-- 主体内容 -->
+      <Content :style="{margin:'64px 0 0 200px'}">
+        <router-view></router-view>
+      </Content>
     </Layout>
     <!-- 登录对话框 -->
     <Modal v-model="loginVisible" title="登录" width="30%" :styles="style" footer-hide>
@@ -99,12 +107,14 @@ export default {
             {
               id: 1,
               name: '发现音乐',
-              type: 'icon-yinle'
+              type: 'icon-yinle',
+              path: 'discovery'
             },
             {
               id: 2,
               name: '私人FM',
-              type: 'icon-xzbd'
+              type: 'icon-xzbd',
+              path: 'discovery'
             }
           ]
         },
@@ -115,17 +125,20 @@ export default {
             {
               id: 3,
               name: '下载管理',
-              type: 'icon-xiazai'
+              type: 'icon-xiazai',
+              path: 'discovery'
             },
             {
               id: 4,
               name: '我的音乐云盘',
-              type: 'icon-B'
+              type: 'icon-B',
+              path: 'discovery'
             },
             {
               id: 5,
               name: '我的收藏',
-              type: 'icon-shoucangjia'
+              type: 'icon-shoucangjia',
+              path: 'discovery'
             }
           ]
         }
@@ -258,7 +271,7 @@ export default {
 
 /* 侧边栏 */
 .ivu-layout-sider {
-  min-height: 486px;
+  /* min-height: 486px; */
   background: #e2eff8;
   font-size: 12px;
 }
