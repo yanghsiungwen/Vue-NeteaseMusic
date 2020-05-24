@@ -71,7 +71,7 @@
         </Scroll>
       </Sider>
       <!-- 主体内容 -->
-      <Content :style="{margin:'64px 0 0 200px'}">
+      <Content :style="{margin:'64px 0 0 200px'}" class="content">
         <router-view></router-view>
       </Content>
     </Layout>
@@ -303,5 +303,8 @@ export default {
 .successLog span {
   padding-left: 10px;
   font-size: 14px;
+}
+.content {
+  width: 1320px;
 }
 </style>
