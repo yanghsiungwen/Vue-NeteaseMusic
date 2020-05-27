@@ -6,6 +6,48 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "3546109",
+      "name": "暂停 (2)",
+      "font_class": "zanting1",
+      "unicode": "e6a9",
+      "unicode_decimal": 59049
+    },
+    {
+      "icon_id": "1159898",
+      "name": "随机播放",
+      "font_class": "suijibofang",
+      "unicode": "e622",
+      "unicode_decimal": 58914
+    },
+    {
+      "icon_id": "2154282",
+      "name": "循环播放_32",
+      "font_class": "xunhuanbofang",
+      "unicode": "e66c",
+      "unicode_decimal": 58988
+    },
+    {
+      "icon_id": "2154283",
+      "name": "单曲循环_32",
+      "font_class": "danquxunhuan",
+      "unicode": "e66d",
+      "unicode_decimal": 58989
+    },
+    {
+      "icon_id": "4517794",
+      "name": "顺序播放",
+      "font_class": "shunxubofang",
+      "unicode": "e626",
+      "unicode_decimal": 58918
+    },
+    {
+      "icon_id": "12349767",
+      "name": "播放",
+      "font_class": "bofang",
+      "unicode": "e61a",
+      "unicode_decimal": 58906
+    },
+    {
       "icon_id": "577350",
       "name": "朋友",
       "font_class": "pengyou",
@@ -76,13 +118,6 @@
       "unicode_decimal": 58923
     },
     {
-      "icon_id": "6446143",
-      "name": "暂停",
-      "font_class": "tianchongxing-",
-      "unicode": "e631",
-      "unicode_decimal": 58929
-    },
-    {
       "icon_id": "8341784",
       "name": "上一首",
       "font_class": "shangyishou",
@@ -95,13 +130,6 @@
       "font_class": "xiayishou",
       "unicode": "e63e",
       "unicode_decimal": 58942
-    },
-    {
-      "icon_id": "10885634",
-      "name": "暂停",
-      "font_class": "zanting",
-      "unicode": "e618",
-      "unicode_decimal": 58904
     },
     {
       "icon_id": "12089102",

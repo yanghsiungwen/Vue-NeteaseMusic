@@ -61,7 +61,7 @@
       </a>
       <div class="card-newest">
         <div class="newsong" v-for="(item,index) in newSong" :key="item.id">
-          <div class="image-newest">
+          <div class="image-newest" @click="getsongId(item.id)">
             <img :src="item.picUrl" />
             <div class="newset-play">
               <div class="bg">
@@ -82,10 +82,12 @@
         </div>
       </div>
     </Card>
+    <div :style="{height:'70px'}"></div>
   </div>
 </template>
 
 <script>
+// 导入轮播图
 import { Carousel3d, Slide } from 'vue-carousel-3d'
 export default {
   components: {
@@ -103,7 +105,9 @@ export default {
       // 卡片视图样式
       noBorder: false,
       // 最新歌曲
-      newSong: []
+      newSong: [],
+      // 歌曲地址
+      songUrl: ''
     }
   },
   created() {
@@ -143,6 +147,11 @@ export default {
         return this.$message.error('获取推荐歌单失败！')
       }
       this.newSong = res.result
+    },
+    // 获取音乐id
+    getsongId(id) {
+      this.$store.dispatch('getSong', id)
+      this.$store.commit('change')
     }
   }
 }
@@ -179,7 +188,8 @@ export default {
   cursor: pointer;
 }
 .item .image img {
-  width: 100%;
+  width: 210px;
+  height: 210px;
   border-radius: 10px;
   transition: 0.3s;
 }

@@ -49,7 +49,7 @@
     <Layout>
       <!-- 侧边栏 -->
       <Sider hide-trigger :style="{margin:'64px 0 0 0', position:'fixed'}">
-        <Scroll height="667">
+        <Scroll :height="getHeight">
           <Menu width="183px" class="siderMenu">
             <MenuGroup v-for="item in siderMenu" :key="item.id" :name="item.id" :title="item.title">
               <MenuItem
@@ -63,17 +63,28 @@
               </MenuItem>
             </MenuGroup>
           </Menu>
-          <Menu width="183px" class="siderMenu musicMenu">
+          <Menu width="183px" class="siderMenu musicMenu" @on-select="getSongList">
             <MenuGroup title="创建的歌单" name="3">
-              <MenuItem v-for="item in musicList" :key="item.id" :name="item.id">{{item.name}}</MenuItem>
+              <MenuItem
+                v-for="item in musicList"
+                :key="item.id"
+                :name="item.id"
+                :to="'list'"
+              >{{item.name}}</MenuItem>
             </MenuGroup>
           </Menu>
         </Scroll>
       </Sider>
       <!-- 主体内容 -->
-      <Content :style="{margin:'64px 0 0 200px'}" class="content">
-        <router-view></router-view>
+      <Content class="content">
+        <router-view :style="{width:getWidth-'220'+'px','max-height':getHeight+'px'}"></router-view>
       </Content>
+      <!-- 播放控件 -->
+      <Footer
+        :style="{position:'fixed',bottom:'0',height:'64px', left:'200px', width:getWidth - '200' +'px', padding:'0','line-height':'64px'}"
+      >
+        <v-play></v-play>
+      </Footer>
     </Layout>
     <!-- 登录对话框 -->
     <Modal v-model="loginVisible" title="登录" width="30%" :styles="style" footer-hide>
@@ -95,7 +106,11 @@
 </template>
 
 <script>
+import vPlay from './play/Play'
 export default {
+  components: {
+    vPlay
+  },
   data() {
     return {
       // 侧边栏列表数据
@@ -198,15 +213,30 @@ export default {
         window.sessionStorage.setItem('cookie', res.cookie)
       })
     },
+    // 退出登录
     logout() {
       window.sessionStorage.clear()
       this.visible = false
       this.isShow = false
       this.musicList = []
       this.$message.success('成功退出！')
+    },
+    // 获取歌单信息
+    getSongList(id) {
+      this.$store.dispatch('asyncGetSongList', id)
+      console.log(id)
     }
   },
-  computed: {}
+  computed: {
+    getHeight() {
+      console.log(document.body.scrollHeight)
+      return document.body.scrollHeight - 64
+    },
+    getWidth() {
+      console.log(document.body.scrollWidth)
+      return document.body.scrollWidth
+    }
+  }
 }
 </script>
 
@@ -305,6 +335,7 @@ export default {
   font-size: 14px;
 }
 .content {
-  width: 1320px;
+  margin: 64px 0 0 200px;
 }
+/* 底部区域 */
 </style>
