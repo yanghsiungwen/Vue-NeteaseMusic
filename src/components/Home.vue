@@ -6,7 +6,7 @@
       <Row>
         <!-- 图标 -->
         <i-col span="5">
-          <div class="brand">
+          <div class="brand" @click="toTop">
             <img src="../assets/img/dragon.png" alt />
             <span>伪易云音乐</span>
           </div>
@@ -34,8 +34,8 @@
           </div>
           <Poptip v-model="visible" width="150" transfer>
             <div class="successLog" v-show="isShow">
-              <img :src="userList.avatarUrl" alt />
-              <span>{{userList.nickname}}</span>
+              <img :src="userList.avatarUrl" v-if="userList" />
+              <span v-if="userList">{{userList.nickname}}</span>
             </div>
             <div slot="content">
               <a @click="logout">
@@ -176,12 +176,19 @@ export default {
       // 登出气泡框显示
       visible: false,
       isShow: false,
-      // 音乐列表
+      // 音乐歌单信息
       musicList: []
     }
   },
-  created() {},
+  created() {
+    // this.musicList = window.sessionStorage.getItem('musicList')
+    // this.userList = window.sessionStorage.getItem('userList')
+  },
   methods: {
+    // 跳转首页
+    toTop() {
+      this.$router.push('/discovery')
+    },
     // 显示对话框
     showLoginDiog() {
       this.loginVisible = true
@@ -204,11 +211,17 @@ export default {
           params: { uid: res.profile.userId }
         })
         console.log(con)
-        this.musicList = con.playlist
         // 提示信息，保存数据
         this.$message.success('登录成功！')
+        this.musicList = con.playlist
+        // 用户资料
         this.userList = res.profile
+        // 保持到浏览器中
+        // window.sessionStorage.setItem('userList', res.profile)
+        // window.sessionStorage.setItem('musicList', con.playlist)
+        // 登出气泡
         this.isShow = true
+        // 登录对话框
         this.loginVisible = false
         window.sessionStorage.setItem('cookie', res.cookie)
       })
@@ -219,6 +232,7 @@ export default {
       this.visible = false
       this.isShow = false
       this.musicList = []
+      this.userList = []
       this.$message.success('成功退出！')
     },
     // 获取歌单信息

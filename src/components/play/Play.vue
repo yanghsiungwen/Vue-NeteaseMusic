@@ -3,10 +3,10 @@
     <div class="playProgress">
       <div class="progress">
         <Slider
-          v-model="songVal"
+          v-model="songTime"
           :step="1000"
           :min="0"
-          :max="musicMes.time"
+          :max="musicMes.time+1000"
           @on-change="changeCurrentTime"
           show-tip="never"
         ></Slider>
@@ -37,9 +37,9 @@
       <!-- 播放按钮 -->
       <i-col span="8" class="btn">
         <div class="playBtn">
-          <i class="iconfont icon-shangyishou"></i>
+          <i class="iconfont icon-shangyishou" @click="playPreSong"></i>
           <Icon :type="iconType" @click="changeIcon" />
-          <i class="iconfont icon-xiayishou"></i>
+          <i class="iconfont icon-xiayishou" @click="playNextSong"></i>
         </div>
       </i-col>
       <!-- 播放进度 -->
@@ -76,18 +76,23 @@
         </div>
       </i-col>
     </div>
-    <audio ref="music" :src="musicUrl.url" loop autoplay></audio>
+    <audio ref="music" :src="musicUrl.url" autoplay></audio>
     <Drawer
       title="Basic Drawer"
       :closable="false"
       v-model="isShowList"
       inner
       scrollable
-      :styles="{height:'500px'}"
+      :width="'400'"
     >
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
+      <Table
+        stripe
+        :columns="listTitle"
+        :data="tableValue"
+        :show-header="false"
+        @on-row-dblclick="playSongs"
+        :size="'small'"
+      ></Table>
     </Drawer>
   </Row>
 </template>
@@ -95,17 +100,35 @@
 <script>
 // 导入vuex
 import { mapState } from 'vuex'
+// import _ from 'lodash'
 export default {
   name: 'v-play',
   data() {
     return {
-      // 歌曲开始时间
-      songVal: 0,
       // 音量
       volValue: 100,
       time: 0,
+      // 获取当前时间并渲染到进度条的右侧
       currentTime: 0,
-      isShowList: false
+      // 展示右下角播放列表
+      isShowList: false,
+      // 播放列表表头
+      listTitle: [
+        {
+          title: '音乐标题',
+          key: 'name',
+          width: '200px',
+          ellipsis: true
+        },
+        {
+          title: '歌手',
+          key: 'artist',
+          width: '140px',
+          ellipsis: true
+        }
+      ],
+      song: [],
+      nextSong: []
     }
   },
   methods: {
@@ -133,23 +156,123 @@ export default {
     // 获取当前时间
     getCurrentTime() {
       if (!this.$refs.music) {
-        return (this.songVal = 0)
+        return this.$store.commit('initSongVal')
+        // return (this.playTime = 0)
       }
       if (!this.$refs.music.paused) {
-        this.songVal += 1000
+        this.$store.commit('addSongVal')
+        // this.playTime += 1000
       }
       this.currentTime = this.$refs.music.currentTime
       if (this.songVal >= this.musicMes.time) {
-        this.songVal = 0
+        this.$store.commit('initSongVal')
+        // this.playTime = 0
       }
+      // console.log(this.songVal)
     },
     // 展示音乐列表
     showList() {
       this.isShowList = !this.isShowList
+    },
+    // 双击播放播放列表中的歌曲
+    playSongs(obj, i) {
+      this.$store.dispatch('getSong', obj.id)
+    },
+
+    // 查找当前歌曲信息
+    getSongIndex() {
+      // 判断播放列表是否有歌曲，并且判断是否正在播放
+      if (this.tableValue.length === 0 && this.musicUrl.length === 0) {
+        this.song = []
+      } else {
+        // 查找正在播放歌曲的信息，获取对应的index值
+        this.song = this.tableValue.find(item => {
+          return item.id === this.musicUrl.id
+        })
+      }
+    },
+
+    // 获取下一首歌曲信息
+    getNextSongMes() {
+      if (this.song && this.song.index > this.tableValue.length) {
+        this.nextSong = []
+      } else {
+        // 通过当前播放的 index+1 查找下首歌曲的信息
+        this.nextSong = this.tableValue.find(item => {
+          if (this.song) {
+            return item.index === this.song.index + 1
+          }
+        })
+      }
+    },
+
+    // 获取上一首歌曲信息
+    getPreSongMes() {
+      if (this.song && this.song.index > this.tableValue.length) {
+        this.nextSong = []
+      } else {
+        // 通过当前播放的 index+1 查找下首歌曲的信息
+        this.nextSong = this.tableValue.find(item => {
+          if (this.song) {
+            return item.index === this.song.index - 1
+          }
+        })
+      }
+    },
+
+    // 循环播放列表歌单
+    playSongsList() {
+      this.getSongIndex()
+      this.getNextSongMes()
+      // 判断 audio 的属性ended 播放完时为true，同时下一首歌曲是否存在，则查找下首歌曲的信息
+      if (this.$refs.music.ended && this.nextSong) {
+        this.$store.dispatch('getSong', this.nextSong.id)
+        this.currentTime = 0
+        this.$store.commit('change')
+      }
+      // console.log(this)
+    },
+
+    // 点击播放下首
+    playNextSong() {
+      this.getSongIndex()
+      this.getNextSongMes()
+      if (this.nextSong) {
+        this.$store.dispatch('getSong', this.nextSong.id)
+        this.$store.commit('change')
+      }
+    },
+
+    // 点击播放上一首
+    playPreSong() {
+      this.getSongIndex()
+      this.getPreSongMes()
+      if (this.nextSong) {
+        this.$store.dispatch('getSong', this.nextSong.id)
+        this.$store.commit('change')
+      }
+    },
+
+    // 播放结束进度条归零，时间归零
+    playEnd() {
+      if (this.$refs.music.ended && !this.nextSong) {
+        this.currentTime = 0
+        this.$store.commit('change')
+      }
     }
   },
   computed: {
-    ...mapState(['musicUrl', 'musicMes', 'iconType']),
+    ...mapState(['musicUrl', 'musicMes', 'iconType', 'songVal', 'tableValue']),
+    // 播放进度条
+    songTime: {
+      get: function() {
+        return this.songVal
+      },
+      set: function(newVal) {
+        this.$store.commit('setSongVal', newVal)
+      }
+    },
+    // 歌曲时长
     fullTime() {
       // 秒
       const dt = this.musicMes.time / 1000
@@ -157,6 +280,7 @@ export default {
       const sec = (parseInt(dt % 60) + '').padStart(2, '0')
       return min + ':' + sec
     },
+    // 当前播放时间
     current() {
       const dt = this.currentTime
       const min = (parseInt(dt / 60) + '').padStart(2, '0')
@@ -164,9 +288,15 @@ export default {
       return min + ':' + sec
     }
   },
+  created() {
+    this.playEnd()
+  },
   mounted() {
-    // 渲染到页面上
+    // 进度条每秒更新+1秒
     this.$nextTick(() => setInterval(this.getCurrentTime, 1000))
+    // 每秒检测，当播放结束就播放下一首
+    this.$nextTick(() => setInterval(this.playSongsList, 1000))
+    this.$nextTick(() => this.playEnd())
   }
 }
 </script>
@@ -274,5 +404,10 @@ export default {
 /* 播放列表 */
 .ivu-drawer-right {
   height: 500px;
+}
+.ivu-table-cell span {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 </style>

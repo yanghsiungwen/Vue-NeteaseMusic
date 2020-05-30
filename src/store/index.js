@@ -16,14 +16,18 @@ export default new Vuex.Store({
       artists: []
     },
     // 暂停显示
-    change: true,
     iconType: 'ios-play',
+    // 当前播放时间
+    songVal: 0,
     // 歌单歌曲列表
-    songsList: {}
+    songsList: {},
+    // 歌单列表
+    tableValue: []
   },
   mutations: {
     // 点击单支歌曲获取音乐url
     saveSongUrl(state, url) {
+      state.iconType = 'ios-pause'
       state.musicUrl = url
       console.log(url)
     },
@@ -40,18 +44,53 @@ export default new Vuex.Store({
     },
     // 修改播放键的样式
     change(state) {
-      state.change = !state.change
-      state.iconType = state.change ? 'ios-play' : 'ios-pause'
+      state.iconType = state.iconType === 'ios-pause' ? 'ios-play' : 'ios-pause'
+    },
+    // 修改播放时间
+    initSongVal(state) {
+      state.songVal = 0
+    },
+    addSongVal(state) {
+      state.songVal += 1000
+    },
+    setSongVal(state, newVal) {
+      state.songVal = newVal
     },
     // 获取歌单列表
     getSongList(state, list) {
+      state.tableValue = []
       state.songsList = list
       console.log(list)
+      state.tableValue = list.tracks.map((item, i) => {
+        const obj = {
+          id: 0,
+          name: '',
+          artist: '',
+          album: '',
+          dt: '',
+          index: 0
+        }
+        obj.index = i
+        obj.id = item.id
+        obj.name = item.name
+        const artist = item.ar.map(item => {
+          return item.name
+        })
+        obj.artist = artist.join(' / ')
+        obj.album = item.al.name
+        const dt = item.dt / 1000
+        const min = (parseInt(dt / 60) + '').padStart(2, '0')
+        const sec = (parseInt(dt % 60) + '').padStart(2, '0')
+        obj.dt = min + ':' + sec
+        return obj
+      })
+      console.log(state.tableValue)
     }
   },
   actions: {
     // 异步请求单支歌曲信息
     getSong(context, id) {
+      context.commit('initSongVal')
       axios.get('song/url', { params: { id } }).then(res => {
         console.log(res)
         context.commit('saveSongUrl', res.data.data[0])
@@ -69,6 +108,6 @@ export default new Vuex.Store({
       })
     }
   },
-  modules: {
+  getter: {
   }
 })

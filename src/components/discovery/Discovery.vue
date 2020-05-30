@@ -34,7 +34,12 @@
         <Icon type="md-arrow-dropright" />
       </a>
       <div class="card">
-        <div class="item" v-for="item in recommendation" :key="item.id">
+        <div
+          class="item"
+          v-for="item in recommendation"
+          :key="item.id"
+          @click="showPlayList(item.id)"
+        >
           <div class="image">
             <img :src="item.picUrl" alt />
           </div>
@@ -90,6 +95,7 @@
 // 导入轮播图
 import { Carousel3d, Slide } from 'vue-carousel-3d'
 export default {
+  // 注册轮播图组件
   components: {
     Carousel3d,
     Slide
@@ -122,11 +128,11 @@ export default {
     // 获取广告专辑
     async getbanner() {
       const { data: res } = await this.$http.get('banner')
-      console.log(res)
       if (res.code !== 200) {
         return this.$message.error('获取广告专辑失败！')
       }
       this.banners = res.banners
+      console.log(res.banners)
     },
     // 获取推荐歌单
     async getRecommendation() {
@@ -148,10 +154,15 @@ export default {
       }
       this.newSong = res.result
     },
-    // 获取音乐id
+    // 获取最新歌曲音乐id
     getsongId(id) {
       this.$store.dispatch('getSong', id)
       this.$store.commit('change')
+    },
+    // 点击跳转歌单详情
+    showPlayList(id) {
+      this.$store.dispatch('asyncGetSongList', id)
+      this.$router.push('/list')
     }
   }
 }
