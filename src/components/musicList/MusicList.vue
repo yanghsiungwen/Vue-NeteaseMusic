@@ -77,6 +77,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import _ from 'lodash'
 export default {
   data() {
     return {
@@ -111,11 +112,13 @@ export default {
     // 获取点播的歌曲url
     playSongs(obj, i) {
       this.$store.dispatch('getSong', obj.id)
-      console.log(i)
+      this.getPlayMenuList = _.cloneDeep(this.tableValue)
+      console.log(this.tableValue)
+      console.log(this.getPlayMenuList)
     }
   },
   computed: {
-    ...mapState(['songsList', 'tableValue']),
+    ...mapState(['songsList', 'tableValue', 'playMenuList']),
     // 歌单创建时间
     changeCreateTime() {
       const dt = new Date(this.songsList.createTime)
@@ -130,6 +133,14 @@ export default {
         return this.songsList.playCount
       } else {
         return Math.ceil(this.songsList.playCount / 10000) + '万'
+      }
+    },
+    getPlayMenuList: {
+      get() {
+        return this.playMenuList
+      },
+      set(newVal) {
+        this.$store.commit('setPlayMenuList', newVal)
       }
     }
   }

@@ -22,7 +22,9 @@ export default new Vuex.Store({
     // 歌单歌曲列表
     songsList: {},
     // 歌单列表
-    tableValue: []
+    tableValue: [],
+    // 播放列表的歌单数组
+    playMenuList: []
   },
   mutations: {
     // 点击单支歌曲获取音乐url
@@ -55,6 +57,10 @@ export default new Vuex.Store({
     },
     setSongVal(state, newVal) {
       state.songVal = newVal
+    },
+    // 当前播放歌单的列表
+    setPlayMenuList(state, newVal) {
+      state.playMenuList = newVal
     },
     // 获取歌单列表
     getSongList(state, list) {

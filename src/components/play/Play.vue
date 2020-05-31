@@ -77,13 +77,13 @@
       </i-col>
     </div>
     <audio ref="music" :src="musicUrl.url" autoplay></audio>
-    <Drawer
+    <!-- <Drawer
       title="Basic Drawer"
       :closable="false"
       v-model="isShowList"
       inner
-      scrollable
       :width="'400'"
+      scrollable
     >
       <Table
         stripe
@@ -92,15 +92,30 @@
         :show-header="false"
         @on-row-dblclick="playSongs"
         :size="'small'"
+        :style="{position:'fixed'}"
       ></Table>
-    </Drawer>
+    </Drawer>-->
+    <div class="bgCover" :style="{height:getHeight+'px',width:getWidth+'px'}" v-show="isShowMenu">
+      <div class="playListMenu" :style="{height:getHeight-'140'+'px'}">
+        <div class="table">
+          <Table
+            stripe
+            :columns="listTitle"
+            :data="playMenuList"
+            :show-header="false"
+            @on-row-dblclick="playSongs"
+            :size="'small'"
+          ></Table>
+        </div>
+      </div>
+      <div class="mask" :style="{width:getWidth-'370'+'px'}" @click="isShowPlayMenu"></div>
+    </div>
   </Row>
 </template>
 
 <script>
 // 导入vuex
 import { mapState } from 'vuex'
-// import _ from 'lodash'
 export default {
   name: 'v-play',
   data() {
@@ -127,8 +142,12 @@ export default {
           ellipsis: true
         }
       ],
+      // 查找到当前歌曲的信息
       song: [],
-      nextSong: []
+      // 查找到下一首或上一首歌曲的信息
+      nextSong: [],
+      // 播放列表是否显示
+      isShowMenu: false
     }
   },
   methods: {
@@ -173,6 +192,11 @@ export default {
     // 展示音乐列表
     showList() {
       this.isShowList = !this.isShowList
+      this.isShowMenu = !this.isShowMenu
+    },
+    isShowPlayMenu() {
+      console.log(111)
+      this.isShowMenu = false
     },
     // 双击播放播放列表中的歌曲
     playSongs(obj, i) {
@@ -182,11 +206,11 @@ export default {
     // 查找当前歌曲信息
     getSongIndex() {
       // 判断播放列表是否有歌曲，并且判断是否正在播放
-      if (this.tableValue.length === 0 && this.musicUrl.length === 0) {
+      if (this.playMenuList.length === 0 && this.musicUrl.length === 0) {
         this.song = []
       } else {
         // 查找正在播放歌曲的信息，获取对应的index值
-        this.song = this.tableValue.find(item => {
+        this.song = this.playMenuList.find(item => {
           return item.id === this.musicUrl.id
         })
       }
@@ -194,11 +218,11 @@ export default {
 
     // 获取下一首歌曲信息
     getNextSongMes() {
-      if (this.song && this.song.index > this.tableValue.length) {
+      if (this.song && this.song.index > this.playMenuList.length) {
         this.nextSong = []
       } else {
         // 通过当前播放的 index+1 查找下首歌曲的信息
-        this.nextSong = this.tableValue.find(item => {
+        this.nextSong = this.playMenuList.find(item => {
           if (this.song) {
             return item.index === this.song.index + 1
           }
@@ -208,11 +232,11 @@ export default {
 
     // 获取上一首歌曲信息
     getPreSongMes() {
-      if (this.song && this.song.index > this.tableValue.length) {
+      if (this.song && this.song.index > this.playMenuList.length) {
         this.nextSong = []
       } else {
         // 通过当前播放的 index+1 查找下首歌曲的信息
-        this.nextSong = this.tableValue.find(item => {
+        this.nextSong = this.playMenuList.find(item => {
           if (this.song) {
             return item.index === this.song.index - 1
           }
@@ -260,9 +284,17 @@ export default {
         this.$store.commit('change')
       }
     }
+    // 深拷贝播放列表
   },
   computed: {
-    ...mapState(['musicUrl', 'musicMes', 'iconType', 'songVal', 'tableValue']),
+    ...mapState([
+      'musicUrl',
+      'musicMes',
+      'iconType',
+      'songVal',
+      'tableValue',
+      'playMenuList'
+    ]),
     // 播放进度条
     songTime: {
       get: function() {
@@ -286,6 +318,16 @@ export default {
       const min = (parseInt(dt / 60) + '').padStart(2, '0')
       const sec = (parseInt(dt % 60) + '').padStart(2, '0')
       return min + ':' + sec
+    },
+    // 当前屏幕高度
+    getHeight() {
+      console.log(document.body.scrollHeight)
+      return document.body.scrollHeight
+    },
+    // 当前屏幕宽度
+    getWidth() {
+      console.log(document.body.scrollWidth)
+      return document.body.scrollWidth
     }
   },
   created() {
@@ -402,9 +444,34 @@ export default {
 }
 
 /* 播放列表 */
-.ivu-drawer-right {
-  height: 500px;
+.bgCover {
+  position: fixed;
+  top: 0;
+  left: 0;
 }
+.bgCover .playListMenu {
+  display: flex;
+  justify-content: center;
+  width: 350px;
+  position: fixed;
+  bottom: 75px;
+  right: 0;
+  /* background: yellowgreen; */
+  /* z-index: 999; */
+  overflow-y: auto;
+}
+.bgCover .playListMenu .table {
+  height: 100%;
+}
+.bgCover .playListMenu ::webkit-scrollbar {
+  display: none;
+}
+.bgCover .mask {
+  height: 100%;
+}
+/* .ivu-drawer-right {
+  height: 500px;
+} */
 .ivu-table-cell span {
   white-space: nowrap;
   text-overflow: ellipsis;
