@@ -1,9 +1,13 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../components/Home.vue'
-import Discovery from '../components/discovery/Discovery.vue'
+// import Home from '../components/Home.vue'
+// import Discovery from '../components/discovery/Discovery.vue'
 // import Play from '../components/play/Play.vue'
-import MusicList from '../components/musicList/MusicList.vue'
+// import MusicList from '../components/musicList/MusicList.vue'
+// 懒加载路由
+const Home = () => import(/* webpackChunkName:"home" */ '../components/Home.vue')
+const Discovery = () => import(/* webpackChunkName:"home" */ '../components/discovery/Discovery.vue')
+const MusicList = () => import(/* webpackChunkName:"home" */ '../components/musicList/MusicList.vue')
 
 Vue.use(VueRouter)
 

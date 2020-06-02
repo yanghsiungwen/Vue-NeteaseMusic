@@ -13,7 +13,8 @@ export default new Vuex.Store({
       name: '',
       picUrl: '',
       time: 0,
-      artists: []
+      artists: [],
+      id: 0
     },
     // 暂停显示
     iconType: 'ios-play',
@@ -24,7 +25,10 @@ export default new Vuex.Store({
     // 歌单列表
     tableValue: [],
     // 播放列表的歌单数组
-    playMenuList: []
+    playMenuList: [],
+    // 是否展示歌词列表
+    isShowPlayCover: false,
+    topVal: '100%'
   },
   mutations: {
     // 点击单支歌曲获取音乐url
@@ -38,6 +42,7 @@ export default new Vuex.Store({
       state.musicMes.name = mes.name
       state.musicMes.picUrl = mes.al.picUrl
       state.musicMes.time = mes.dt
+      state.musicMes.id = mes.id
       state.musicMes.artists = mes.ar.map(item => {
         return item.name
       })
@@ -91,6 +96,11 @@ export default new Vuex.Store({
         return obj
       })
       console.log(state.tableValue)
+    },
+    // 展示播放歌词页面
+    showPlayCover(state) {
+      state.isShowPlayCover = !state.isShowPlayCover
+      state.topVal = state.isShowPlayCover ? '64px' : '100%'
     }
   },
   actions: {

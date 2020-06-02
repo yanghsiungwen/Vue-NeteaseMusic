@@ -1,5 +1,6 @@
 <template>
   <Layout>
+    <playCover class="playCover" :style="{top:topVal,transition: 'all 0.5s ease'}"></playCover>
     <!-- 头部 -->
     <Header :style="{position: 'fixed', width: '100%', 'z-index':'9999'}">
       <!-- 导航栏 -->
@@ -81,9 +82,9 @@
       </Content>
       <!-- 播放控件 -->
       <Footer
-        :style="{position:'fixed',bottom:'0',height:'64px', left:'200px', width:getWidth - '200' +'px', padding:'0','line-height':'64px'}"
+        :style="{position:'fixed',bottom:'0',height:'64px', left:'200px', width:getWidth - '200' +'px', padding:'0','line-height':'64px','z-index':99}"
       >
-        <v-play></v-play>
+        <v-play :style="{'z-index':'9999'}"></v-play>
       </Footer>
     </Layout>
     <!-- 登录对话框 -->
@@ -106,10 +107,13 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import vPlay from './play/Play'
+import playCover from './playCover/PlayCover'
 export default {
   components: {
-    vPlay
+    vPlay,
+    playCover
   },
   data() {
     return {
@@ -242,6 +246,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['isShowPlayCover', 'topVal']),
     getHeight() {
       console.log(document.body.scrollHeight)
       return document.body.scrollHeight - 64
@@ -349,7 +354,20 @@ export default {
   font-size: 14px;
 }
 .content {
-  margin: 64px 0 0 200px;
+  margin: 64px 0 64px 200px;
+  overflow: auto;
 }
 /* 底部区域 */
+/* 播放歌词页 */
+.playCover {
+  height: calc(100% - 128px);
+  width: calc(100% - 200px);
+  left: 200px;
+  padding-bottom: 40px;
+  position: fixed;
+  background: #f5f7f9;
+  z-index: 9;
+  transition: all 0.5s ease;
+  overflow: auto;
+}
 </style>

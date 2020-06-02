@@ -21,7 +21,7 @@
     <div class="player">
       <!-- 歌曲信息 -->
       <i-col span="8" class="songMessage">
-        <div class="avater">
+        <div class="avater" @click="showPlayCover">
           <img :src="musicMes.picUrl" v-show="musicMes.picUrl" />
         </div>
         <div class="mes">
@@ -118,6 +118,9 @@
 import { mapState } from 'vuex'
 export default {
   name: 'v-play',
+  // components: {
+  //   playCover
+  // },
   data() {
     return {
       // 音量
@@ -194,6 +197,7 @@ export default {
       this.isShowList = !this.isShowList
       this.isShowMenu = !this.isShowMenu
     },
+    // 展示播放列表
     isShowPlayMenu() {
       console.log(111)
       this.isShowMenu = false
@@ -201,6 +205,11 @@ export default {
     // 双击播放播放列表中的歌曲
     playSongs(obj, i) {
       this.$store.dispatch('getSong', obj.id)
+    },
+
+    // 展示播放歌曲歌词评论
+    showPlayCover() {
+      this.$store.commit('showPlayCover')
     },
 
     // 查找当前歌曲信息
@@ -346,6 +355,7 @@ export default {
 <style scoped>
 /* 音乐信息 */
 .songMessage {
+  padding-left: 25px;
   display: flex;
   /* align-items: center;*/
   font-size: 10px;
@@ -353,6 +363,7 @@ export default {
 }
 .avater {
   margin: 0 20px;
+  cursor: pointer;
 }
 .avater img {
   width: 50px;
@@ -400,23 +411,23 @@ export default {
   width: 100%;
   top: -20px;
   /* margin: 0 auto; */
-  left: 50px;
+  left: 5px;
   z-index: 999;
 }
 .playProgress .ivu-slider {
-  width: 91%;
+  width: 98%;
 }
 
 /* 播放时间 */
 .countDown {
   position: absolute;
-  top: -35px;
+  top: -20px;
   left: 5px;
 }
 
 .countTime {
   position: absolute;
-  top: -35px;
+  top: -20px;
   right: 20px;
 }
 
@@ -459,6 +470,7 @@ export default {
   /* background: yellowgreen; */
   /* z-index: 999; */
   overflow-y: auto;
+  background-color: #fff;
 }
 .bgCover .playListMenu .table {
   height: 100%;

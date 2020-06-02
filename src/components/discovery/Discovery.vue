@@ -15,14 +15,7 @@
   </Carousel>-->
   <div>
     <!-- 轮播图 -->
-    <carousel3d
-      :autoplay="autoplay"
-      width="499"
-      height="185"
-      space="250"
-      controlsVisible
-      border="0"
-    >
+    <carousel3d autoplay width="499" height="185" space="250" controlsVisible border="0">
       <slide v-for="(slide,i) in banners" :key="i" :index="i">
         <img :src="slide.imageUrl" />
       </slide>
@@ -102,8 +95,6 @@ export default {
   },
   data() {
     return {
-      // 轮播图
-      autoplay: true,
       // 广告数据
       banners: [],
       // 推荐歌单数据
