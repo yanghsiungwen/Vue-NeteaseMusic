@@ -1,23 +1,22 @@
+<!--
+  pc端发现页
+  @author yang 2020-7-13
+-->
 <template>
-  <!-- <Carousel
-    autoplay
-    loop
-    v-model="value"
-    :autoplay-speed="autoSpeed"
-    dots="outside"
-    trigger="hover"
-  >
-    <CarouselItem v-for="item in banners" :key="item.encodeId">
-      <div class="demo-carousel">
-        <img :src="item.imageUrl" />
-      </div>
-    </CarouselItem>
-  </Carousel>-->
   <div>
     <!-- 轮播图 -->
-    <carousel3d autoplay width="499" height="185" space="250" controlsVisible border="0">
+    <carousel3d
+      autoplay
+      :autoplayTimeout="3000"
+      width="499"
+      height="185"
+      space="250"
+      controlsVisible
+      border="0"
+      v-if="banners.length"
+    >
       <slide v-for="(slide,i) in banners" :key="i" :index="i">
-        <img :src="slide.imageUrl" />
+        <img v-lazy="slide.imageUrl" />
       </slide>
     </carousel3d>
     <!-- 推荐歌单 -->
@@ -27,28 +26,14 @@
         <Icon type="md-arrow-dropright" />
       </a>
       <div class="card">
-        <div
-          class="item"
+        <recom-list
           v-for="item in recommendation"
           :key="item.id"
-          @click="showPlayList(item.id)"
-        >
-          <div class="image">
-            <img :src="item.picUrl" alt />
-          </div>
-          <div class="text">
-            <p>{{item.name}}</p>
-          </div>
-          <div class="count">
-            <Icon type="ios-play" />
-            <span>{{Math.ceil((item.playCount/10000))+'万'}}</span>
-          </div>
-          <div class="play">
-            <div class="bg">
-              <Icon type="md-play" class="btn" />
-            </div>
-          </div>
-        </div>
+          :id="item.id"
+          :img="item.picUrl"
+          :name="item.name"
+          :count="item.playCount"
+        ></recom-list>
       </div>
     </Card>
     <!-- 最新音乐 -->
@@ -80,18 +65,19 @@
         </div>
       </div>
     </Card>
-    <div :style="{height:'70px'}"></div>
   </div>
 </template>
 
 <script>
 // 导入轮播图
 import { Carousel3d, Slide } from 'vue-carousel-3d'
+import RecomList from '@/components/commont/RecomList'
 export default {
   // 注册轮播图组件
   components: {
     Carousel3d,
-    Slide
+    Slide,
+    RecomList,
   },
   data() {
     return {
@@ -104,7 +90,7 @@ export default {
       // 最新歌曲
       newSong: [],
       // 歌曲地址
-      songUrl: ''
+      songUrl: '',
     }
   },
   created() {
@@ -119,20 +105,17 @@ export default {
     // 获取广告专辑
     async getbanner() {
       const { data: res } = await this.$http.get('banner')
-      if (res.code !== 200) {
-        return this.$message.error('获取广告专辑失败！')
-      }
       this.banners = res.banners
       console.log(res.banners)
     },
     // 获取推荐歌单
     async getRecommendation() {
       const { data: res } = await this.$http.get('personalized', {
-        params: { limit: 10 }
+        params: { limit: 10 },
       })
       console.log(res)
       if (res.code !== 200) {
-        return this.$message.error('获取推荐歌单失败！')
+        return this.$Message.error('获取推荐歌单失败！')
       }
       this.recommendation = res.result
     },
@@ -141,25 +124,20 @@ export default {
       const { data: res } = await this.$http.get('personalized/newsong')
       console.log(res)
       if (res.code !== 200) {
-        return this.$message.error('获取推荐歌单失败！')
+        return this.$Message.error('获取推荐歌单失败！')
       }
       this.newSong = res.result
     },
     // 获取最新歌曲音乐id
     getsongId(id) {
       this.$store.dispatch('getSong', id)
-      this.$store.commit('change')
+      // this.$store.commit('change')
     },
-    // 点击跳转歌单详情
-    showPlayList(id) {
-      this.$store.dispatch('asyncGetSongList', id)
-      this.$router.push('/list')
-    }
-  }
+  },
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .carousel-3d-container {
   width: 1150px;
 }
@@ -167,66 +145,19 @@ export default {
 /* 推荐歌单样式 */
 .recommendation {
   background: #f5f7f9;
-}
-.card {
-  display: grid;
-  grid-template-columns: 210px 210px 210px 210px 210px;
-  grid-template-rows: 260px 260px;
-  grid-gap: 30px;
-  justify-content: center;
-}
-.recommendation a {
-  margin-left: 50px;
-  color: #000;
-  font-size: 20px;
-  font-weight: 600;
-}
-.item {
-  position: relative;
-  width: 210px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-}
-.item .image img {
-  width: 210px;
-  height: 210px;
-  border-radius: 10px;
-  transition: 0.3s;
-}
-.count {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #f0eaea;
-  font-size: 12px;
-}
-.play {
-  visibility: hidden;
-  position: absolute;
-  bottom: 60px;
-  right: 10px;
-  transition: 0.05s;
-}
-.bg {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 30px;
-  width: 30px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 50px;
-}
-.item:hover img {
-  box-shadow: 0 0 10px black;
-  transform: scale(1.01);
-}
-.item:hover .play {
-  visibility: visible;
+  a {
+    margin-left: 50px;
+    color: #000;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .card {
+    display: grid;
+    grid-template-columns: 210px 210px 210px 210px 210px;
+    grid-template-rows: 260px 260px;
+    grid-gap: 30px;
+    justify-content: center;
+  }
 }
 
 /* 最新歌曲样式 */
@@ -261,7 +192,8 @@ export default {
   visibility: hidden;
   position: absolute;
   top: 25%;
-  left: 25%;
+  left: 50%;
+  transform: translateX(-50%);
   cursor: pointer;
 }
 .newsong .image-newest:hover .newset-play {

@@ -1,12 +1,17 @@
+<!--
+  pc端页面底部播放信息栏
+  @author yang 2020-7-13
+  @interface song/url 获取音乐url
+-->
 <template>
-  <Row>
+  <Row class="play">
     <div class="playProgress">
       <div class="progress">
         <Slider
           v-model="songTime"
           :step="1000"
           :min="0"
-          :max="musicMes.time+1000"
+          :max="musicMes.time+2500"
           @on-change="changeCurrentTime"
           show-tip="never"
         ></Slider>
@@ -76,25 +81,7 @@
         </div>
       </i-col>
     </div>
-    <audio ref="music" :src="musicUrl.url" autoplay></audio>
-    <!-- <Drawer
-      title="Basic Drawer"
-      :closable="false"
-      v-model="isShowList"
-      inner
-      :width="'400'"
-      scrollable
-    >
-      <Table
-        stripe
-        :columns="listTitle"
-        :data="tableValue"
-        :show-header="false"
-        @on-row-dblclick="playSongs"
-        :size="'small'"
-        :style="{position:'fixed'}"
-      ></Table>
-    </Drawer>-->
+    <audio ref="music" :src="musicUrl.url" @ended="end" @canplay="ready"></audio>
     <div class="bgCover" :style="{height:getHeight+'px',width:getWidth+'px'}" v-show="isShowMenu">
       <div class="playListMenu" :style="{height:getHeight-'140'+'px'}">
         <div class="table">
@@ -105,6 +92,7 @@
             :show-header="false"
             @on-row-dblclick="playSongs"
             :size="'small'"
+            :row-class-name="addActive"
           ></Table>
         </div>
       </div>
@@ -124,7 +112,7 @@ export default {
   data() {
     return {
       // 音量
-      volValue: 100,
+      volValue: window.localStorage.getItem('__volumn__') * 100,
       time: 0,
       // 获取当前时间并渲染到进度条的右侧
       currentTime: 0,
@@ -136,39 +124,36 @@ export default {
           title: '音乐标题',
           key: 'name',
           width: '200px',
-          ellipsis: true
+          ellipsis: true,
         },
         {
           title: '歌手',
           key: 'artist',
           width: '140px',
-          ellipsis: true
-        }
+          ellipsis: true,
+        },
       ],
       // 查找到当前歌曲的信息
       song: [],
       // 查找到下一首或上一首歌曲的信息
       nextSong: [],
       // 播放列表是否显示
-      isShowMenu: false
+      isShowMenu: false,
+      // 歌曲已准备
+      songReady: false,
     }
   },
   methods: {
     // 播放按钮 样式转换
     changeIcon() {
-      if (this.iconType === 'ios-play' && this.musicUrl.length !== 0) {
-        this.$refs.music.play()
-        this.$store.commit('change')
-      } else if (this.iconType === 'ios-pause' && this.musicUrl.length !== 0) {
-        this.$refs.music.pause()
-        this.$store.commit('change')
-      }
+      this.$store.commit('change')
     },
     // 改变音量
     changeVolumeValue(val) {
       // console.log(111)
       console.log(val)
       this.$refs.music.volume = val / 100
+      window.localStorage.setItem('__volumn__', this.$refs.music.volume)
     },
     // 改变播放进度
     changeCurrentTime(val) {
@@ -202,6 +187,26 @@ export default {
       console.log(111)
       this.isShowMenu = false
     },
+
+    // 歌曲准备就绪
+    ready() {
+      this.songReady = true
+    },
+
+    // 播放
+    async play() {
+      await this.$refs.music.play()
+    },
+
+    // 播放结束
+    end() {
+      this.$store.commit('change')
+      this.playNextSong()
+    },
+    pause() {
+      this.$refs.music.pause()
+    },
+
     // 双击播放播放列表中的歌曲
     playSongs(obj, i) {
       this.$store.dispatch('getSong', obj.id)
@@ -219,7 +224,7 @@ export default {
         this.song = []
       } else {
         // 查找正在播放歌曲的信息，获取对应的index值
-        this.song = this.playMenuList.find(item => {
+        this.song = this.playMenuList.find((item) => {
           return item.id === this.musicUrl.id
         })
       }
@@ -231,7 +236,7 @@ export default {
         this.nextSong = []
       } else {
         // 通过当前播放的 index+1 查找下首歌曲的信息
-        this.nextSong = this.playMenuList.find(item => {
+        this.nextSong = this.playMenuList.find((item) => {
           if (this.song) {
             return item.index === this.song.index + 1
           }
@@ -245,25 +250,12 @@ export default {
         this.nextSong = []
       } else {
         // 通过当前播放的 index+1 查找下首歌曲的信息
-        this.nextSong = this.playMenuList.find(item => {
+        this.nextSong = this.playMenuList.find((item) => {
           if (this.song) {
             return item.index === this.song.index - 1
           }
         })
       }
-    },
-
-    // 循环播放列表歌单
-    playSongsList() {
-      this.getSongIndex()
-      this.getNextSongMes()
-      // 判断 audio 的属性ended 播放完时为true，同时下一首歌曲是否存在，则查找下首歌曲的信息
-      if (this.$refs.music.ended && this.nextSong) {
-        this.$store.dispatch('getSong', this.nextSong.id)
-        this.currentTime = 0
-        this.$store.commit('change')
-      }
-      // console.log(this)
     },
 
     // 点击播放下首
@@ -272,7 +264,7 @@ export default {
       this.getNextSongMes()
       if (this.nextSong) {
         this.$store.dispatch('getSong', this.nextSong.id)
-        this.$store.commit('change')
+        this.play()
       }
     },
 
@@ -282,18 +274,42 @@ export default {
       this.getPreSongMes()
       if (this.nextSong) {
         this.$store.dispatch('getSong', this.nextSong.id)
-        this.$store.commit('change')
+        this.play()
       }
+    },
+    /**
+     * 当前播放歌曲高亮，添加类名
+     * @param {Object} row 当前行的数据
+     * @param {Number} index 当前行的索引号
+     */
+    addActive(row, index) {
+      if (this.isActive(row)) {
+        return 'active'
+      }
+    },
+    /**
+     * 判断当前歌曲与当前行id
+     * @param {Object} song 歌曲数据
+     */
+    isActive(song) {
+      return song.id === this.musicMes.id
     },
 
     // 播放结束进度条归零，时间归零
-    playEnd() {
-      if (this.$refs.music.ended && !this.nextSong) {
-        this.currentTime = 0
-        this.$store.commit('change')
-      }
-    }
+    // playEnd() {
+    //   if (this.$refs.music.ended && !this.nextSong) {
+    //     this.currentTime = 0
+    //     this.$store.commit('change')
+    //   }
+    // }
     // 深拷贝播放列表
+  },
+  watch: {
+    isPlay(newVal) {
+      this.$nextTick(() => {
+        newVal ? this.play() : this.pause()
+      })
+    },
   },
   computed: {
     ...mapState([
@@ -302,16 +318,17 @@ export default {
       'iconType',
       'songVal',
       'tableValue',
-      'playMenuList'
+      'playMenuList',
+      'isPlay',
     ]),
     // 播放进度条
     songTime: {
-      get: function() {
+      get: function () {
         return this.songVal
       },
-      set: function(newVal) {
+      set: function (newVal) {
         this.$store.commit('setSongVal', newVal)
-      }
+      },
     },
     // 歌曲时长
     fullTime() {
@@ -337,31 +354,33 @@ export default {
     getWidth() {
       console.log(document.body.scrollWidth)
       return document.body.scrollWidth
-    }
+    },
   },
   created() {
-    this.playEnd()
+    // this.playEnd()
   },
   mounted() {
     // 进度条每秒更新+1秒
     this.$nextTick(() => setInterval(this.getCurrentTime, 1000))
-    // 每秒检测，当播放结束就播放下一首
-    this.$nextTick(() => setInterval(this.playSongsList, 1000))
-    this.$nextTick(() => this.playEnd())
-  }
+    // 修改播放器的音量
+    this.$refs.music.volume = window.localStorage.getItem('__volumn__')
+  },
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+.play {
+  background: #e9eff5;
+  z-index: 9;
+}
 /* 音乐信息 */
 .songMessage {
   padding-left: 25px;
   display: flex;
-  /* align-items: center;*/
   font-size: 10px;
-  /* justify-content: space-evenly;  */
 }
 .avater {
+  line-height: 64px;
   margin: 0 20px;
   cursor: pointer;
 }
@@ -411,11 +430,11 @@ export default {
   width: 100%;
   top: -20px;
   /* margin: 0 auto; */
-  left: 5px;
+  left: 20px;
   z-index: 999;
 }
 .playProgress .ivu-slider {
-  width: 98%;
+  width: 96%;
 }
 
 /* 播放时间 */
@@ -432,10 +451,13 @@ export default {
 }
 
 /* 播放列表 */
-.playMethod {
-  float: left;
+.playMenu {
+  height: 64px;
   margin-right: 40px;
   padding-left: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
 .playMenu i {
   font-size: 26px;
@@ -443,15 +465,20 @@ export default {
 }
 
 /* 播放音量 */
-.icon {
-  font-size: 20px;
-  margin-right: 20px;
-}
-.sliderbar {
-  position: absolute;
-  width: 70%;
-  top: 15px;
-  left: 20px;
+.volume {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  .icon {
+    font-size: 20px;
+    margin-right: 20px;
+  }
+  .sliderbar {
+    position: absolute;
+    width: 70%;
+    top: 15px;
+    left: 20px;
+  }
 }
 
 /* 播放列表 */

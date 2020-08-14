@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <router-view class="main-content"></router-view>
   </div>
 </template>
 
@@ -11,4 +11,8 @@ export default {
 </script>
 
 <style>
+.main-content {
+  height: 100%;
+  overflow: hidden;
+}
 </style>

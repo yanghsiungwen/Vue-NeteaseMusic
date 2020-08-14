@@ -1,90 +1,89 @@
 <template>
-  <div>
-    <div class="songMes">
-      <div class="coverImg">
-        <img :src="musicMes.picUrl" alt />
-      </div>
-      <div class="lyc"></div>
-    </div>
-    <div class="others">
-      <div class="allComments">
-        <div class="hotComments">
-          <p>精彩评论</p>
-          <div class="comment" v-for="item in commentList.hotComments" :key="item.commentId">
-            <div class="userAvatat">
-              <img :src="item.user.avatarUrl" alt />
-            </div>
-            <div class="content">
-              <div class="text">
-                <span>{{item.user.nickname}}:</span>
-                <span class>{{item.content}}</span>
+  <transition name="slider">
+    <div v-if="isShowPlayCover">
+      <coverLyc></coverLyc>
+      <div class="others">
+        <div class="allComments">
+          <div class="hotComments">
+            <p>精彩评论</p>
+            <div class="comment" v-for="item in commentList.hotComments" :key="item.commentId">
+              <div class="userAvatat">
+                <img :src="item.user.avatarUrl" alt />
               </div>
-              <div class="time">
-                <span>{{item.time | changeTime}}</span>
-                <div class="like">
-                  <Icon type="ios-thumbs-up" class="icon" />
-                  <span>{{item.likedCount}}</span>
+              <div class="content">
+                <div class="text">
+                  <span>{{item.user.nickname}}:</span>
+                  <span class>{{item.content}}</span>
+                </div>
+                <div class="time">
+                  <span>{{item.time | changeTime}}</span>
+                  <div class="like">
+                    <Icon type="ios-thumbs-up" class="icon" />
+                    <span>{{item.likedCount}}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="newestcomments">
-          <p>最新评论({{commentList.total}})</p>
-          <div class="comment" v-for="item in commentList.comments" :key="item.commentId">
-            <div class="userAvatat">
-              <img :src="item.user.avatarUrl" alt />
-            </div>
-            <div class="content">
-              <div class="text">
-                <span>{{item.user.nickname}}:</span>
-                <span class>{{item.content}}</span>
+          <div class="newestcomments">
+            <p>最新评论({{commentList.total}})</p>
+            <div class="comment" v-for="item in commentList.comments" :key="item.commentId">
+              <div class="userAvatat">
+                <img :src="item.user.avatarUrl" alt />
               </div>
-              <div class="time">
-                <span>{{item.time | changeTime}}</span>
-                <div class="like">
-                  <Icon type="ios-thumbs-up" class="icon" />
-                  <span>{{item.likedCount}}</span>
+              <div class="content">
+                <div class="text">
+                  <span>{{item.user.nickname}}:</span>
+                  <span class>{{item.content}}</span>
+                </div>
+                <div class="time">
+                  <span>{{item.time | changeTime}}</span>
+                  <div class="like">
+                    <Icon type="ios-thumbs-up" class="icon" />
+                    <span>{{item.likedCount}}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          <Page
+            class="page"
+            :total="commentList.total"
+            @on-change="getAnotherComment"
+            :pageSize="30"
+          />
         </div>
-        <Page
-          class="page"
-          :total="commentList.total"
-          @on-change="getAnotherComment"
-          :pageSize="30"
-        />
-      </div>
 
-      <div class="recommend">
-        <p>相似歌曲</p>
-        <div class="simiSong" v-for="item in simiSong" :key="item.id">
-          <div class="songImg">
-            <img :src="item.album.picUrl" alt />
-          </div>
-          <div>
-            <div class="songName">
-              <span>{{item.name}}</span>
+        <div class="recommend">
+          <p>相似歌曲</p>
+          <div class="simiSong" v-for="item in simiSong" :key="item.id">
+            <div class="songImg">
+              <img :src="item.album.picUrl" alt />
             </div>
-            <div class="artist">
-              <span v-for="(item2,i) in item.artists" :key="i">
-                {{item2.name}}
-                <span v-if="item.artists.length-1>i">/</span>
-              </span>
+            <div>
+              <div class="songName">
+                <span>{{item.name}}</span>
+              </div>
+              <div class="artist">
+                <span v-for="(item2,i) in item.artists" :key="i">
+                  {{item2.name}}
+                  <span v-if="item.artists.length-1>i">/</span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import coverLyc from './CoverLyc'
 export default {
   name: 'playCover',
+  components: { coverLyc },
   data() {
     return {
       // 评论列表
@@ -97,17 +96,15 @@ export default {
     // this.initComment()
   },
   watch: {
-    isShowPlayCover() {
+    id() {
       this.initComment()
     }
   },
   methods: {
     // 获取首页评论
     initComment() {
-      if (this.isShowPlayCover) {
-        this.getComment()
-        this.getSimiSong()
-      }
+      this.getComment()
+      this.getSimiSong()
     },
     // 当页码改变获取该页的评论
     getAnotherComment(pageSize) {
@@ -135,7 +132,10 @@ export default {
     }
   },
   computed: {
-    ...mapState(['musicMes', 'isShowPlayCover'])
+    ...mapState(['musicMes', 'isShowPlayCover']),
+    id() {
+      return this.musicMes.id
+    }
   },
   filters: {
     changeTime(val) {
@@ -153,32 +153,6 @@ export default {
 </script>
 
 <style scoped>
-.songMes {
-  display: flex;
-  justify-content: center;
-  margin-top: 30px;
-  margin-bottom: 50px;
-}
-.coverImg {
-  position: relative;
-  display: inline-block;
-  height: 300px;
-  width: 300px;
-  background: #1c1d20;
-  border: 10px solid #e4e0e0;
-  border-radius: 50%;
-}
-.coverImg img {
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  border: 10px solid #000;
-  border-radius: 50%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
 /* 评论区 */
 .others {
   width: 1100px;
@@ -228,12 +202,14 @@ export default {
 .newestcomments {
   margin-top: 50px;
 }
+
 /* 页码 */
 .allComments .page {
   margin: 20px 0;
   display: flex;
   justify-content: center;
 }
+
 /* 相似歌曲 */
 .recommend {
   width: 300px;

@@ -5,8 +5,26 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <link rel="icon" href="../src/assets/img/dragon.ico">
-  <title><%= htmlWebpackPlugin.options.title %></title>
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+  <title><%= htmlWebpackPlugin.options.isProd ? '' : 'dev - ' %>网抑云音乐</title>
+
+  <% if(htmlWebpackPlugin.options.isProd){ %>
+  <!-- 导入cdnjs文件 -->
+  <script src="https://cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+  <!-- <script src="https://cdn.staticfile.org/vue-router/3.2.0/vue-router.min.js"></script> -->
+  <script src="https://cdn.staticfile.org/axios/0.19.2/axios.js"></script>
+  <script src="https://cdn.staticfile.org/lodash.js/4.17.15/lodash.min.js"></script>
+  <script src="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/iview/3.5.4/iview.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue-router/3.1.6/vue-router.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue-lazyload/1.3.3/vue-lazyload.js"></script>
+
+  <!-- 导入css -->
+  <!-- nprogress样式表 -->
+  <link rel="stylesheet" href="https://cdn.staticfile.org/nprogress/0.2.0/nprogress.min.css" />
+  <link rel="stylesheet" href="https://cdn.staticfile.org/iview/3.5.4/styles/iview.css" />
+  <% } %>
+
 </head>
 
 <body>
