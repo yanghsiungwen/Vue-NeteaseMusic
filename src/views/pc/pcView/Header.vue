@@ -1,3 +1,8 @@
+<!--
+  页面的头部区域
+  @interface user/detail 获取用户信息
+  @interface user/playlist 获取用户歌单
+-->
 <template>
   <div class="header">
     <!-- 图标 -->
@@ -46,6 +51,7 @@
 <script>
 import { mapState } from 'vuex'
 import Search from './Search'
+import { getUserDetail, getUserPlayList } from '@/api'
 export default {
   name: 'v-header',
   components: { Search },
@@ -69,6 +75,7 @@ export default {
     }
   },
   created() {
+    // 从浏览器缓存中取出 用户id值
     var userId = window.localStorage.getItem('__userId__')
     if (userId) {
       this.getUser(userId)
@@ -107,9 +114,7 @@ export default {
     },
     // 根据id获取信息
     async getUser(id) {
-      const { data: res } = await this.$http.get('user/detail', {
-        params: { uid: id },
-      })
+      const { data: res } = await getUserDetail(id)
       console.log(res)
       if (res.code !== 200) {
         return this.$Message.error('登录失败！')
@@ -121,10 +126,9 @@ export default {
       // 保持到浏览器中
       window.localStorage.setItem('__userId__', res.profile.userId)
       // 获取用户歌单信息
-      const { data: con } = await this.$http.get('user/playlist', {
-        params: { uid: id },
-      })
+      const { data: con } = await getUserPlayList(id)
       console.log(con)
+      // 对列表菜单进行处理
       this.musicList = this.categorizeMusicList(
         con.playlist,
         res.profile.userId

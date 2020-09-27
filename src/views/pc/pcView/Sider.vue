@@ -1,3 +1,6 @@
+<!--
+  侧边栏
+-->
 <template>
   <Menu width="200px" class="siderMenu">
     <MenuGroup v-for="item in menuWithPlayList" :key="item.id" :name="item.id" :title="item.title">
@@ -26,23 +29,23 @@ export default {
               id: 1,
               name: '发现音乐',
               type: 'icon-yinle',
-              path: '/discovery'
+              path: '/discovery',
             },
             {
               id: 2,
               name: '私人FM',
               type: 'icon-xzbd',
-              path: '/discovery'
+              path: '/discovery',
             },
             {
               id: 3,
               name: '每日推荐',
               type: 'icon-B',
-              path: '/recommend/songs'
-            }
-          ]
-        }
-      ]
+              path: '/recommend/songs',
+            },
+          ],
+        },
+      ],
     }
   },
   methods: {
@@ -63,8 +66,8 @@ export default {
     getHeight() {
       console.log(document.body.scrollHeight)
       return document.body.scrollHeight - 64
-    }
-  }
+    },
+  },
 }
 </script>
 

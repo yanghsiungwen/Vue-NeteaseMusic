@@ -1,6 +1,12 @@
+<!--
+  歌词模块
+  @interface /lyric 获取歌词
+-->
 <template>
   <div>
+    <!-- 播放页面的上部分 -->
     <div class="songMes">
+      <!-- 左侧歌曲封面旋转 -->
       <div class="cover">
         <img class="play-bar-support" src="@/assets/img/play-bar-support.png" alt />
         <img class="play-bar" :class="{paused:!isPlay}" src="@/assets/img/play-bar.png" alt />
@@ -8,6 +14,7 @@
           <img :src="musicMes.picUrl" alt />
         </div>
       </div>
+      <!-- 右侧歌词部分 -->
       <div class="lyc">
         <div class="content">
           <div class="songName">
@@ -33,6 +40,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { getLycData } from '@/api'
 export default {
   name: 'coverLyc',
   data() {
@@ -63,6 +71,7 @@ export default {
     this.getLyric()
   },
   watch: {
+    // 当 id 改变时，获取当前歌词
     id() {
       this.getLyric()
     },
@@ -84,11 +93,7 @@ export default {
   methods: {
     // 获取歌词信息
     async getLyric() {
-      const { data: res } = await this.$http.get('lyric', {
-        params: {
-          id: this.musicMes.id,
-        },
-      })
+      const { data: res } = await getLycData(this.musicMes.id)
       console.log(res)
       this.lyric = this.parseLyric(res.lrc.lyric)
       console.log(this.lyric)

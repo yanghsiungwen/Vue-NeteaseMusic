@@ -2,6 +2,7 @@
   pc端歌单列表
   @author yang 2020-7-13
   @components {Header}
+  @interface song/detail 批量获取歌单歌曲的信息
 -->
 <template>
   <div class="list">
@@ -163,7 +164,7 @@ export default {
       // 监听路由地址id的变化，实现歌单数据获取初始化
       handler() {
         this.init()
-        this.scrollToHeader()
+        // this.scrollToHeader()
       },
     },
     tableValue() {

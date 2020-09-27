@@ -1,3 +1,7 @@
+<!--
+  歌单的信息部分
+  @interface playlist/detail 获取歌单的信息
+-->
 <template>
   <Row :style="{'margin-top':'10px'}" v-if="songsList">
     <!-- 歌单封面 -->

@@ -1,10 +1,17 @@
+<!--
+  歌曲的歌词评论播放页面
+  @interface comment/music 歌曲评论
+  @interface simi/song 相似歌曲
+-->
 <template>
   <transition name="slider">
-    <div v-if="isShowPlayCover">
+    <div v-if="isShowPlayCover" ref="cover">
+      <!-- 歌词封面部分 -->
       <coverLyc></coverLyc>
-      <div class="others">
+      <div class="others" ref="comment">
+        <!-- 评论 -->
         <div class="allComments">
-          <div class="hotComments">
+          <div class="hotComments" v-if="pageNum === 1">
             <p>精彩评论</p>
             <div class="comment" v-for="item in commentList.hotComments" :key="item.commentId">
               <div class="userAvatat">
@@ -25,7 +32,7 @@
               </div>
             </div>
           </div>
-          <div class="newestcomments">
+          <div class="newestcomments" ref="newComment">
             <p>最新评论({{commentList.total}})</p>
             <div class="comment" v-for="item in commentList.comments" :key="item.commentId">
               <div class="userAvatat">
@@ -53,7 +60,7 @@
             :pageSize="30"
           />
         </div>
-
+        <!-- 相识歌曲 -->
         <div class="recommend">
           <p>相似歌曲</p>
           <div class="simiSong" v-for="item in simiSong" :key="item.id">
@@ -81,6 +88,7 @@
 <script>
 import { mapState } from 'vuex'
 import coverLyc from './CoverLyc'
+import { getSongComment, getSimiSongList } from '@/api'
 export default {
   name: 'playCover',
   components: { coverLyc },
@@ -89,16 +97,26 @@ export default {
       // 评论列表
       commentList: [],
       // 相似歌曲
-      simiSong: []
+      simiSong: [],
+      pageNum: 1,
+      top: 0,
     }
   },
   created() {
     // this.initComment()
   },
+  mounted() {
+    if (this.$refs.comment) {
+      this.$nextTick(() => {
+        this.top = this.$refs.comment.offsetTop
+        console.log(this.top)
+      })
+    }
+  },
   watch: {
     id() {
       this.initComment()
-    }
+    },
   },
   methods: {
     // 获取首页评论
@@ -108,34 +126,37 @@ export default {
     },
     // 当页码改变获取该页的评论
     getAnotherComment(pageSize) {
+      this.pageNum = pageSize
       this.getComment(pageSize)
+      this.$refs.cover.scrollTo({
+        top: this.top,
+        behavior: 'smooth',
+      })
     },
     // 请求歌单信息
     async getComment(pageSize) {
       const params = {
         id: this.musicMes.id,
         limit: 30,
-        offset: 0
+        offset: 0,
       }
       params.offset = pageSize ? (pageSize - 1) * 30 : 0
-      const { data: res } = await this.$http.get('comment/music', { params })
+      const { data: res } = await getSongComment(params)
       console.log(res)
       this.commentList = res
     },
     // 请求相似歌曲
     async getSimiSong() {
-      const { data: res } = await this.$http.get('simi/song', {
-        params: { id: this.musicMes.id }
-      })
+      const { data: res } = await getSimiSongList(this.musicMes.id)
       console.log(res)
       this.simiSong = res.songs
-    }
+    },
   },
   computed: {
     ...mapState(['musicMes', 'isShowPlayCover']),
     id() {
       return this.musicMes.id
-    }
+    },
   },
   filters: {
     changeTime(val) {
@@ -147,8 +168,8 @@ export default {
       const mm = (dt.getMinutes() + '').padStart(2, '0')
       const ss = (dt.getSeconds() + '').padStart(2, '0')
       return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
-    }
-  }
+    },
+  },
 }
 </script>
 

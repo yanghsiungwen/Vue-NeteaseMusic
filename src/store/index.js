@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from 'axios'
+import { getSongUrl, getSongDetail, getListDetail, getListSongDetail } from '@/api'
 
 Vue.use(Vuex)
 
@@ -135,23 +135,27 @@ export default new Vuex.Store({
       // if (context.state.musicMes.id === id) return false
       context.commit('clearCurrentSong')
       context.commit('initSongVal')
-      axios.get('song/url', { params: { id } }).then(res => {
+      // 获取歌曲url
+      getSongUrl(id).then(res => {
         console.log(res)
         context.commit('saveSongUrl', res.data.data[0])
       })
-      axios.get('song/detail', { params: { ids: id } }).then(res => {
+      // 获取歌曲信息
+      getSongDetail(id).then(res => {
         console.log(res)
         context.commit('saveSongMes', res.data.songs[0])
       })
     },
     // 异步请求歌单信息
     asyncGetSongList(context, id) {
-      axios.get('playlist/detail', { params: { id } }).then(res => {
+      // 获取歌单信息
+      getListDetail(id).then(res => {
         console.log(res)
         context.commit('getListMes', res.data.playlist)
         const trackIds = res.data.playlist.trackIds.map(({ id }) => id)
         console.log(trackIds)
-        axios.get(`song/detail?ids=${trackIds}`).then(res => {
+        // 批量获取歌曲信息
+        getListSongDetail(trackIds).then(res => {
           console.log(res.data.songs)
           context.commit('getSongList', res.data.songs)
         })

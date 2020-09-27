@@ -5,6 +5,7 @@
 -->
 <template>
   <Row class="play">
+    <!-- 进度条 -->
     <div class="playProgress">
       <div class="progress">
         <Slider
@@ -17,12 +18,15 @@
         ></Slider>
       </div>
     </div>
+    <!-- 歌曲进度时间 -->
     <div class="countDown">
       <span>{{musicMes.time?current:'00:00'}}</span>
     </div>
+    <!-- 歌曲时长 -->
     <div class="countTime">
       <span>{{musicMes.time?fullTime:'00:00'}}</span>
     </div>
+    <!-- 操作栏 -->
     <div class="player">
       <!-- 歌曲信息 -->
       <i-col span="8" class="songMessage">
@@ -81,7 +85,9 @@
         </div>
       </i-col>
     </div>
+    <!-- audio 组件 -->
     <audio ref="music" :src="musicUrl.url" @ended="end" @canplay="ready"></audio>
+    <!-- 播放列表 -->
     <div class="bgCover" :style="{height:getHeight+'px',width:getWidth+'px'}" v-show="isShowMenu">
       <div class="playListMenu" :style="{height:getHeight-'140'+'px'}">
         <div class="table">

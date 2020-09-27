@@ -1,1 +1,6 @@
 export * from './search'
+export * from './song'
+export * from './comment'
+export * from './list'
+export * from './discovery'
+export * from './lyric'

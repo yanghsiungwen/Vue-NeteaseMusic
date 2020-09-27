@@ -4,6 +4,7 @@ import VueRouter from 'vue-router'
 // import Discovery from '../components/discovery/Discovery.vue'
 // import Play from '../components/play/Play.vue'
 // import MusicList from '../components/musicList/MusicList.vue'
+
 // 懒加载路由
 const Home = () => import(/* webpackChunkName:"home" */ '../views/pc/Home.vue')
 const Discovery = () => import(/* webpackChunkName:"home" */ '../views/pc/pcView/Discovery.vue')
@@ -53,18 +54,16 @@ const router = new VueRouter({
   mode: 'history',
   routes,
   // 路由跳转后返回顶部
-  // scrollBehavior(to, from, savedPosition) {
-  //   return { x: 0, y: 0 }
-  // }
+  scrollBehavior: () => ({ y: 0 })
 })
 
-router.beforeEach((to, from, next) => {
-  document.body.scrollTop = 0
-  // firefox
-  document.documentElement.scrollTop = 0
-  // safari
-  window.pageYOffset = 0
-  next()
-})
+// router.beforeEach((to, from, next) => {
+//   document.body.scrollTop = 0
+//   // firefox
+//   document.documentElement.scrollTop = 0
+//   // safari
+//   window.pageYOffset = 0
+//   next()
+// })
 
 export default router

@@ -1,6 +1,9 @@
 <!--
   pc端发现页
   @author yang 2020-7-13
+  @interface personalized/newsong 获取最新歌曲
+  @interface personalized 获取推荐歌单
+  @interface banner 获取广告信息
 -->
 <template>
   <div>
@@ -72,6 +75,7 @@
 // 导入轮播图
 import { Carousel3d, Slide } from 'vue-carousel-3d'
 import RecomList from '@/components/commont/RecomList'
+import { getRecomList, getNewSong, getBannerList } from '@/api'
 export default {
   // 注册轮播图组件
   components: {
@@ -104,15 +108,13 @@ export default {
   methods: {
     // 获取广告专辑
     async getbanner() {
-      const { data: res } = await this.$http.get('banner')
+      const { data: res } = await getBannerList()
       this.banners = res.banners
       console.log(res.banners)
     },
     // 获取推荐歌单
     async getRecommendation() {
-      const { data: res } = await this.$http.get('personalized', {
-        params: { limit: 10 },
-      })
+      const { data: res } = await getRecomList(10)
       console.log(res)
       if (res.code !== 200) {
         return this.$Message.error('获取推荐歌单失败！')
@@ -121,7 +123,7 @@ export default {
     },
     // 获取新音乐
     async getnewSong() {
-      const { data: res } = await this.$http.get('personalized/newsong')
+      const { data: res } = await getNewSong()
       console.log(res)
       if (res.code !== 200) {
         return this.$Message.error('获取推荐歌单失败！')

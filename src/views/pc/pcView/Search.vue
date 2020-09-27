@@ -1,5 +1,5 @@
 <!--
-  歌单，歌曲，专辑封面
+  搜索框
   @author yang 2020-7-13
   @interface /search/hot - 热搜列表(简略)
   @interface /search/suggest - 搜索建议
@@ -8,61 +8,59 @@
   @params {String} radius - 图片圆角大小
 -->
 <template>
-  <div class="search">
+  <div class="search" v-clickoutside:click="hideShow">
     <!-- 输入框 -->
     <Input
       search
       enter-button
       @on-focus="onFocus"
-      @on-blur="onBlur"
       @on-change="onChange(inputValue)"
       v-model.trim="inputValue"
       ref="input"
       placeholder="搜索音乐，视频，歌曲，电台"
     />
     <!-- 搜索内容显示框 -->
-    <toggle class="toggle" :reserveDoms="[$refs.input && $refs.input.$el]" :show.sync="showToggle">
-      <div class="search-panel" v-show="showToggle">
-        <!-- 搜索关键字内容 -->
-        <div class="search-tips" v-if="tipsShow">
-          <div class="block" v-for="(normalizeSuggest,index) in normalizeSuggests" :key="index">
-            <div class="title">{{normalizeSuggest.title}}</div>
-            <div class="song-list">
-              <ul>
-                <li v-for="item in normalizeSuggest.data" :key="item.id" class="list-item">
-                  <span>{{item.name}}</span>
-                  <span v-if="item.artists">{{' - '}}</span>
-                  <span v-for="(aritst,i) in item.artists" :key="aritst.id">
-                    {{aritst.name}}
-                    <span v-if="item.artists.length-1>i">/</span>
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <!-- 热搜内容 -->
-        <div class="search-hot" v-else>
-          <!-- 热搜列表 -->
-          <div class="block-hot">
-            <div class="title">热门搜索</div>
-            <div class="hot-item">
-              <Button
-                class="btn"
-                size="small"
-                v-for="(item,index) in searchHots"
-                :key="index"
-              >{{item.first}}</Button>
-            </div>
-          </div>
-          <!-- 搜索历史列表 -->
-          <div class="block-his">
-            <div class="title">搜索历史</div>
-            <div class="content">--没有搜索历史--</div>
+    <div class="search-panel" v-show="showToggle">
+      <!-- 搜索关键字内容 -->
+      <div class="search-tips" v-if="tipsShow">
+        <div class="block" v-for="(normalizeSuggest,index) in normalizeSuggests" :key="index">
+          <div class="title">{{normalizeSuggest.title}}</div>
+          <div class="song-list">
+            <ul>
+              <li v-for="item in normalizeSuggest.data" :key="item.id" class="list-item">
+                <span>{{item.name}}</span>
+                <span v-if="item.artists">{{' - '}}</span>
+                <span v-for="(aritst,i) in item.artists" :key="aritst.id">
+                  {{aritst.name}}
+                  <span v-if="item.artists.length-1>i">/</span>
+                </span>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
-    </toggle>
+      <!-- 热搜内容 -->
+      <div class="search-hot" v-else>
+        <!-- 热搜列表 -->
+        <div class="block-hot">
+          <div class="title">热门搜索</div>
+          <div class="hot-item">
+            <Button
+              class="btn"
+              size="small"
+              v-for="(item,index) in searchHots"
+              :key="index"
+            >{{item.first}}</Button>
+          </div>
+        </div>
+        <!-- 搜索历史列表 -->
+        <div class="block-his">
+          <div class="title">搜索历史</div>
+          <div class="content">--没有搜索历史--</div>
+        </div>
+      </div>
+    </div>
+    <!-- </toggle> -->
   </div>
 </template>
 
@@ -70,16 +68,17 @@
 import { getSearchSuggest } from '@/api'
 // import { genArtistisText } from '@/until'
 import { debounce } from 'lodash'
-import Toggle from './Toggle'
+import Clickoutside from '@/utils/clickoutside.js'
+// import Toggle from './Toggle'
 export default {
   name: 'Search',
-  components: { Toggle },
+  // components: { Toggle },
   data() {
     return {
       showToggle: false, // 是否展示搜索信息框
       inputValue: '', // 输入框内容
       searchHots: [], // 热门搜索信息
-      suggest: {} // 搜索关键词得到的信息
+      suggest: {}, // 搜索关键词得到的信息
     }
   },
   computed: {
@@ -89,27 +88,31 @@ export default {
     tipsShow() {
       return (
         this.inputValue.length &&
-        ['songs', 'playlist'].find(key => {
+        ['songs', 'playlist'].find((key) => {
           return this.suggest[key] && this.suggest[key].length
         })
       )
     },
+    // 列表展示内容
     normalizeSuggests() {
       return [
         {
           title: '单曲',
-          data: this.suggest.songs
+          data: this.suggest.songs,
         },
         {
           title: '歌单',
-          data: this.suggest.playlists
+          data: this.suggest.playlists,
         },
         {
           title: 'MV',
-          data: this.suggest.mvs
-        }
-      ].filter(item => item.data && item.data.length)
-    }
+          data: this.suggest.mvs,
+        },
+      ].filter((item) => item.data && item.data.length)
+    },
+  },
+  directives: {
+    Clickoutside,
   },
   async created() {
     /**
@@ -117,17 +120,18 @@ export default {
      */
     const {
       data: {
-        result: { hots }
-      }
+        result: { hots },
+      },
     } = await this.$http.get('search/hot')
     console.log(hots)
     this.searchHots = hots
   },
   methods: {
+    // 展示下拉框
     onFocus() {
       this.showToggle = true
     },
-    onBlur() {
+    hideShow() {
       this.showToggle = false
     },
     /**
@@ -135,7 +139,7 @@ export default {
      * @param {String} val - 输入内容
      * 防抖，控制在0.5s请求一次
      */
-    onChange: debounce(function(val) {
+    onChange: debounce(function (val) {
       if (!val.trim()) {
         return
       }
@@ -144,8 +148,8 @@ export default {
         this.suggest = result
         console.log(this.suggest)
       })
-    }, 500)
-  }
+    }, 500),
+  },
 }
 </script>
 
@@ -161,11 +165,13 @@ li {
     width: 300px;
     vertical-align: middle;
   }
-  .toggle {
+  .search-panel {
+    z-index: 9;
     position: absolute;
     width: 360px;
-    background: rgba(233, 239, 245, 0.7);
+    background: rgba(233, 239, 245, 1);
     .search-tips {
+      overflow-y: auto;
       .block {
         margin-bottom: 20px;
         .title {
